@@ -1,5 +1,6 @@
 import pandas as pd
 import requests
+import matplotlib.pyplot as plt
 from io import StringIO
 
 
@@ -100,6 +101,10 @@ def main():
                                                          start=(max_imbal_period_end_list[0]-pd.Timedelta("60m")).strftime("%H:%M"),
                                                          end=max_imbal_period_end_list[0].strftime("%H:%M")))
 
+    fig,ax=plt.subplots(2,1,figsize=(12,12))
+    ax[0].plot(vol_pricedf["settle_period_start_dt"], vol_pricedf["ImbalancePriceAmount"])
+    ax[1].bar(vol_pricedf["settle_period_start_dt"], vol_pricedf["abs_imbal_quantity"], width=1/48, align="edge")
+    plt.show()
 
     # vol_pricedf.to_csv("vol_pricedf.csv")
 
