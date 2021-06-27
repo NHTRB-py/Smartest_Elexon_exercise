@@ -11,4 +11,4 @@ Notes:
 
 Extensions
 - Add charts/analysis comparing the previous day to recent or longer term history such as histograms for the prices/volumes to give a visual representation of how this day compares to (for example) the last 7 days.
-- Analyse seasonality: do particular hours in the day or particular days of the week exhibit similar behaviours 
+- Analyse seasonality: check if particular hours in the day or particular days of the week exhibit similar behaviours
