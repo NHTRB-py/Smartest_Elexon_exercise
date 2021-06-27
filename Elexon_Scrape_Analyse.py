@@ -1,6 +1,7 @@
 import pandas as pd
 import requests
 import matplotlib.pyplot as plt
+from matplotlib.dates import DateFormatter
 from io import StringIO
 
 
@@ -85,8 +86,8 @@ def main():
     total_imbal_vol=vol_pricedf["abs_imbal_quantity"].sum()
     total_imbal_cost=vol_pricedf["imbal_cost"].sum()
     imbal_cost_per_unit=total_imbal_cost/total_imbal_vol
-    print("Daily total imbalance cost for {date} = {imb_cost}".format(date=prev_date_str,imb_cost=total_imbal_cost))
-    print("Daily imbalance unit rate for {date} = {imb_rate}".format(date=prev_date_str,imb_rate=imbal_cost_per_unit))
+    print("Daily total imbalance cost for {date} was £{imb_cost:,.2f}".format(date=prev_date_str,imb_cost=total_imbal_cost))
+    print("Daily imbalance unit rate for {date} was £{imb_rate:,.2f}".format(date=prev_date_str,imb_rate=imbal_cost_per_unit))
 
     vol_pricedf["SettlementDate"]=pd.to_datetime(vol_pricedf["SettlementDate"], format="%Y-%m-%d")
     vol_pricedf["settle_period_start_dt"]=vol_pricedf["SettlementDate"]+pd.Timedelta("30m")*(vol_pricedf["SettlementPeriod"]-1)
@@ -95,16 +96,32 @@ def main():
     max_hr_vol=vol_pricedf["vol_rolling_sum_hr"].max()
     max_vol_rows=vol_pricedf[vol_pricedf["vol_rolling_sum_hr"]==max_hr_vol].reset_index()
     max_imbal_period_end_list=[max_vol_rows.at[i,"settle_period_end_dt"] for i in range(len(max_vol_rows))]
-    print("Maximum hourly imbalance volume for {date} was {vol:.2f} "
+    print("Maximum hourly imbalance volume for {date} was {vol:.2f} MWh "
           "in the hour between {start} and {end}".format(date=prev_date_str,
                                                          vol=max_hr_vol,
                                                          start=(max_imbal_period_end_list[0]-pd.Timedelta("60m")).strftime("%H:%M"),
                                                          end=max_imbal_period_end_list[0].strftime("%H:%M")))
-
-    fig,ax=plt.subplots(2,1,figsize=(12,12))
+    # Further plotting of imbalance price, volume and cost series for each half-hourly period
+    fig,ax=plt.subplots(2,1, sharex=True,figsize=(12,12))
     ax[0].plot(vol_pricedf["settle_period_start_dt"], vol_pricedf["ImbalancePriceAmount"])
-    ax[1].bar(vol_pricedf["settle_period_start_dt"], vol_pricedf["abs_imbal_quantity"], width=1/48, align="edge")
-    plt.show()
+    ax[0].set_title("Imbalance Price for "+prev_date_str)
+    timefmt = DateFormatter("%H:%M")
+    ax[0].set_ylabel("Imbalance Price (GBP)")
+    ax[1].bar(vol_pricedf["settle_period_start_dt"], vol_pricedf["Imbalance Quantity (MAW)"], width=1/48, align="edge")
+    ax[1].set_title("Imbalance Volume for "+prev_date_str)
+    ax[1].set_ylabel("Imbalance Volume (MWh)")
+    ax[1].xaxis.set_major_formatter(timefmt)
+    plt.savefig("Latest_Daily_Imbalance_Price_Volume")
+    plt.close("all")
+
+    fig,ax=plt.subplots(figsize=(12,6))
+    ax.plot(vol_pricedf["settle_period_start_dt"], vol_pricedf["imbal_cost"])
+    ax.set_title("Imbalance Cost for "+prev_date_str)
+    ax.set_ylabel("Imbalance Cost (GBP)")
+    ax.xaxis.set_major_formatter(timefmt)
+    plt.savefig("Latest_Daily_Imbalance_Cost")
+    plt.close("all")
+
 
     # vol_pricedf.to_csv("vol_pricedf.csv")
 
