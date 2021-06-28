@@ -1,6 +1,6 @@
 # Elexon_scrape
 
-This repo contains Python code to scrape data from Elexon's REST API and print a message displaying daily total imbalance cost and daily imbalance unit rate for the previous day, and the hour which had the greatest imbalance volume. The code also saves charts of the imbalance prices, volume and cost throughout the previous day.
+This repo contains Python code in Elexon_Scrape_Analyse.py to scrape data from Elexon's REST API and print a message displaying daily total imbalance cost and daily imbalance unit rate for the previous day, and the hour which had the greatest imbalance volume. The code also saves charts of the imbalance prices, volume and cost throughout the previous day.
 
 
 Notes: 
