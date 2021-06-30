@@ -38,6 +38,8 @@ def elexon_request_simple(url:str):
     elexon_df.dropna(inplace=True)
     return elexon_df
 
+
+
 def elexon_request_checked(url:str):
     """
     Returns pandas DataFrame from Elexon URL response having checked response is CSV format
@@ -82,7 +84,8 @@ def main():
                          left_on=["Settlement Date", "Settlement Period", "Imbalance Quantity Direction"],
                          right_on=["SettlementDate", "SettlementPeriod", "imbal_direction"])
     vol_pricedf["abs_imbal_quantity"]=vol_pricedf["Imbalance Quantity (MAW)"].abs()
-    vol_pricedf["imbal_cost"]=vol_pricedf["abs_imbal_quantity"]*vol_pricedf["ImbalancePriceAmount"]
+    # vol_pricedf["imbal_cost"]=vol_pricedf["abs_imbal_quantity"]*vol_pricedf["ImbalancePriceAmount"]
+    vol_pricedf["imbal_cost"]=vol_pricedf["Imbalance Quantity (MAW)"]*vol_pricedf["ImbalancePriceAmount"]
     total_imbal_vol=vol_pricedf["abs_imbal_quantity"].sum()
     total_imbal_cost=vol_pricedf["imbal_cost"].sum()
     imbal_cost_per_unit=total_imbal_cost/total_imbal_vol
