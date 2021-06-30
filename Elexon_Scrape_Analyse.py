@@ -24,7 +24,7 @@ def elexon_request_test(url: str):
     print(req.status_code)
     # print(req.headers)
     print(req.headers["Content-Type"])
-    # print(req.text)
+    print(req.text)
     return req.status_code
 
 
@@ -51,10 +51,11 @@ def elexon_request_checked(url: str):
     else:
         elexon_df = pd.read_csv(StringIO(req.text), header=[4])
         elexon_df.dropna(inplace=True)
+
     return elexon_df
 
 
-def url_gen(series_code: str = "B1770", period: int = 1, api_key: str = apikey, date_str: str = prev_date_str):
+def url_gen(series_code: str = "B1770", period = "*", api_key: str = apikey, date_str: str = prev_date_str):
     """
     Generates url to get csv data from Elexon API (v1), tested on series B1770 and B1780
     :param series_code: name of series, full reference available at https://www.elexon.co.uk/documents/training-guidance/bsc-guidance-notes/bmrs-api-and-data-push-user-guide-2/
@@ -69,14 +70,13 @@ def url_gen(series_code: str = "B1770", period: int = 1, api_key: str = apikey, 
 
 
 def main():
-    B1770dflist = [elexon_request_checked(url_gen(series_code="B1770", period=i, api_key=apikey)) for i in range(1, 49)]
-    B1770df = pd.concat(B1770dflist)
+
+    B1770df=elexon_request_checked(url_gen("B1770"))
     # B1770df.to_csv("B1770df.csv")
     B1770df["imbal_direction"] = B1770df["PriceCategory"].replace({"Insufficient balance": "DEFICIT",
                                                                    "Excess balance": "SURPLUS"})  # create imbalance column corresponding to values in B1780
 
-    B1780dflist = [elexon_request_checked(url_gen(series_code="B1780", period=i, api_key=apikey)) for i in range(1, 49)]
-    B1780df = pd.concat(B1780dflist)
+    B1780df=elexon_request_checked(url_gen("B1780"))
     # B1780df.to_csv("B1780df.csv")
     # print(B1770df.info())
     # print(B1780df.info())
